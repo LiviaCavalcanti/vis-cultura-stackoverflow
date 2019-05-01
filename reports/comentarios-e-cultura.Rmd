@@ -10,6 +10,8 @@ theme: sandstone
 library(tidyverse)
 library(here)
 library(viridis)
+library(plotly)
+
 theme_set(theme_bw())
 
 knitr::opts_chunk$set(tidy = FALSE,
@@ -48,15 +50,58 @@ rid(four_regions ~ site, scales = "free_y")
 dados %>%
     ggplot(aes(x=comentaram_prop, y = PDI, size=(log10(usuarios)), color=(log10(Internet)))) +
     geom_point(alpha=.8) + 
-    facet_grid(four_regions ~ site, scales = "free_y") +
-    labs(color="Pessoas com acesso à Internet", size="Quantidade de usuários", y="Power Distance Index", x="Proporção de comentários", title="Influência da nacionalidade na participação de comunidades Q&A(computação)")
+    facet_grid(four_regions ~ site) +
+    labs(color="Pessoas com acesso à Internet", size="Quantidade de usuários", y="Power Distance Index", x="Proporção de comentários", title="Influência da nacionalidade na participação de comunidades Q&A(computação)") +
+  scale_colour_gradient(low = "black", high = "blue")
 
 ```
 ## Outras formas de ver
 
 Em seguida, faça 5 visualizações que usem as mesmas variáveis e também pontos, mas que sejam **menos eficazes** que a que você escolheu acima. 
+```{r}
+dados %>%
+    ggplot(aes(x=comentaram_prop, y = (log10(Internet)), size=(log10(usuarios)), color=PDI)) +
+    geom_point() + 
+    labs(color="Power Distance Index", size="Quantidade de usuários", y="Pessoas com acesso à Internet", x="Proporção de comentários", title="Influência da nacionalidade na participação de comunidades Q&A(computação)") 
 
+```
+
+```{r}
+dados %>%
+    ggplot(aes(x=comentaram_prop, y = PDI, size=usuarios, color=(Internet))) +
+    geom_point(alpha=.8) + 
+    labs(color="Pessoas com acesso à Internet", size="Quantidade de usuários", y="Power Distance Index", x="Proporção de comentários", title="Influência da nacionalidade na participação de comunidades Q&A(computação)") +
+  scale_fill_gradientn(colours = terrain.colors(5))
+
+```
+```{r}
+dados %>%
+    ggplot(aes(x=Internet, y = usuarios, size=PDI, color=comentaram_prop)) +
+    geom_point(alpha=.8) + 
+    labs(color="Proporção de comentários", size="Power Distance Index", y="Quantidade de usuários", x="Pessoas com acesso à Internet", title="Influência da nacionalidade na participação de comunidades Q&A(computação)") 
+
+```
+```{r}
+dados %>%
+    ggplot(aes(x=Internet, y = country, size=PDI, color=comentaram_prop)) +
+    geom_point(alpha=.8) + 
+    geom_text(mapping = aes(label = usuarios), size = 5,  nudge_x = 0.5,  nudge_y = 0.5)+
+    labs(color="Proporção de comentários", size="Power Distance Index", y="Quantidade de usuários", x="Pessoas com acesso à Internet", title="Influência da nacionalidade na participação de comunidades Q&A(computação)") 
+
+```
 ## Bônus
 
 Inclua o continente dos países (`six_regions`) na visualização.
 
+```{r}
+library(plotly)
+
+p <- dados %>%
+    ggplot(aes(x=comentaram_prop, y = PDI, size=(log10(usuarios)), color=log10(Internet))) +
+    geom_point(alpha=.8 ) + 
+    #facet_grid(four_regions ~ site, scales = "free_y") +
+    labs(color="Pessoas com acesso à Internet", size="Quantidade de usuários", y="Power Distance Index", x="Proporção de comentários", title="Influência da nacionalidade na participação de comunidades Q&A(computação)") +
+  scale_colour_gradient(low = "black", high = "blue")
+ggplotly(p)
+
+```
